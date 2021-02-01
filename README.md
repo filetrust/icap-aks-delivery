@@ -343,7 +343,7 @@ ICAP-Administration
 
 Sync single apps
 ```
-argodcd app sync <app service name>
+argocd app sync <app service name>
 
 Sync all apps
 ```bash
@@ -354,12 +354,12 @@ argocd app list -o name | xargs argocd app sync
 
 Delete a single app
 ```
-argocd app sync
+argocd app delete <app service name>
 ```
 
 Delete all apps
 ```
-argocd app list -o name | xargs argocd app sync
+argocd app list -o name | xargs argocd app delete
 ```
 
 #### Add context for easy switching between clusters
