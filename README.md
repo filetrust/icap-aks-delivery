@@ -342,10 +342,13 @@ ICAP-Administration
 #### Sync sing and multiple apps 
 
 Sync single apps
-```
+
+```bash
 argocd app sync <app service name>
+```
 
 Sync all apps
+
 ```bash
 argocd app list -o name | xargs argocd app sync
 ```
