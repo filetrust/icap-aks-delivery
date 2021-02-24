@@ -34,6 +34,12 @@ variable "max_count" {
   default     = "100"
 }
 
+variable "registry_name" {
+  description = "This is a consolidated name based on org, environment, region"
+  type        = string
+  default     = ""
+}
+
 # Chart Variables
 ## Adaptation Chart
 variable "release_name01" {

@@ -4,6 +4,7 @@ resource_group=$(az group exists -n $RESOURCE_GROUP_NAME)
 storage_account=$(az storage account show --name $STORAGE_ACCOUNT_NAME 2>/dev/null | jq -r  '.name')
 container=$(az storage container exists --account-name $STORAGE_ACCOUNT_NAME  --account-key $ARM_ACCESS_KEY --name $CONTAINER_NAME 2>/dev/null | jq '.exists')
 keyvault=$(az keyvault show --name $VAULT_NAME 2>/dev/null | jq -r '.name')
+container_registry=$(az acr show --name $CONTAINER_REGISTRY_NAME --resource-group $RESOURCE_GROUP_NAME 2>/dev/null | jq -r '.name')
 
 red=`tput setaf 1`
 white=`tput sgr 0`
@@ -92,6 +93,29 @@ else
   echo ${white}
 fi
 
+# Check $CONTAINER_REGISTRY_NAME exists
+if [ "$container_registry" = "$CONTAINER_REGISTRY_NAME" ]; then
+  echo ${green}
+  echo "Keyvault $CONTAINER_REGISTRY_NAME is present";
+  echo ${white}
+  parent_resource=$(az acr show --name $CONTAINER_REGISTRY_NAME --resource-group $RESOURCE_GROUP_NAME 2>/dev/null | jq -r '.resourceGroup')
+
+  if [ "$parent_resource"  != $RESOURCE_GROUP_NAME ]; then
+      echo ${red}
+      echo "$container_registry belongs to differnet resource group $RESOURCE_GROUP_NAME";
+      echo "We suggest you to give unique keyvault name and try below command";
+      echo "export $CONTAINER_REGISTRY_NAME='' "
+      echo "az keyvault create --name $CONTAINER_REGISTRY_NAME --resource-group $RESOURCE_GROUP_NAME --location $REGION"
+      echo ${white}
+  fi
+
+else
+  echo ${red}
+  echo "$CONTAINER_REGISTRY_NAME is not there";
+  echo "Please run below command";
+  echo "az keyvault create --name $CONTAINER_REGISTRY_NAME --resource-group $RESOURCE_GROUP_NAME --location $REGION"
+  echo ${white}
+fi
 
 # Check terraform_backend_key is added to keyvault
 terraform_backend_key=$(az keyvault secret show --name terraform-backend-key --vault-name $VAULT_NAME --query value -o tsv)
@@ -107,4 +131,3 @@ else
   echo "Secret \"terraform_backend_key\" is set in keyvault \"$VAULT_NAME\"";
   echo ${white}
 fi
-

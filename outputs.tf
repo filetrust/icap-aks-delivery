@@ -11,7 +11,3 @@ output "file_drop_cluster_outputs" {
 	value = module.create_aks_cluster_file_drop
 	sensitive = true
 }
-
-output "acr_outputs" {
-	value = module.create_acr
-}

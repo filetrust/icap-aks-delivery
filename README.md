@@ -15,6 +15,7 @@
     - [GIT](#git)
     - [Azure Subscription Pre Requisite](#azure-subscription-pre-requisite)
     - [Inputs](#inputs)
+    - [Tarball for ICAP Images](#tarball-for-icap-images)
   - [2. Usage](#2-usage)
     - [2.1 Clone Repo.](#21-clone-repo)
     - [Pre-requisite healthcheck.](#pre-requisite-healthcheck)
@@ -24,12 +25,15 @@
     - [2.5 Add Terraform Backend Key to Environment](#25-add-terraform-backend-key-to-environment)
     - [2.6 Azure setup Healthcheck](#26-azure-setup-healthcheck)
     - [2.7 Add Secrets to main KeyVault](#27-add-secrets-to-main-keyvault)
+      - [Credentials for Azure Container Registry](#credentials-for-azure-container-registry)
     - [2.8 File Modifications](#28-file-modifications)
     - [3 Creating SSL Certs](#3-creating-ssl-certs)
       - [Self signed quick start](#self-signed-quick-start)
       - [Customer Certificates](#customer-certificates)
   - [4. Pre deployment](#4-pre-deployment)
-    - [ICAP Port customization](#icap-port-customization)
+    - [4.1 Pushing images to ACR](#41-pushing-images-to-acr)
+    - [Adding the registry to values](#adding-the-registry-to-values)
+    - [4.3 ICAP Port customization](#43-icap-port-customization)
   - [5. Deployment](#5-deployment)
     - [5.1 Setup and Initialise Terraform](#51-setup-and-initialise-terraform)
   - [6. Testing the solution.](#6-testing-the-solution)
@@ -49,6 +53,7 @@
 - Microsoft account
 - Azure Subscription
 - Dockerhub account 
+- Tarball containing all images for ICAP service
 
 | Name | Version |
 |------|---------|
@@ -316,6 +321,10 @@ These are the variables required for the deployment
 | VAULT_NAME | Vault Name for initial azure setup | `string` | n/a | yes |
 | key | state key name for terraform | `string` | n/a | yes |
 
+### Tarball for ICAP Images
+
+The tarball called ```_images.tgz``` will be provided by Glasswall Solutions and steps on how to utilise this will be section 4.1
+
 ## 2. Usage
 
 ### 2.1 Clone Repo.
@@ -358,8 +367,9 @@ cp .env.example .env
 vim .env
 ```
 
-- Enter required values for all variables (REGION - any Azure region, RESOURCE_GROUP_NAME, STORAGE_ACCOUNT_NAME - accepts just small letters and numbers, CONTAINER_NAME, TAGS, VAULT_NAME, DH_SA_USERNAME, DH_SA_PASSWORD, SmtpUser, SmtpPass, token_username="policy-management") 
+- Enter required values for all variables (REGION - any Azure region, RESOURCE_GROUP_NAME, STORAGE_ACCOUNT_NAME - accepts just small letters and numbers, CONTAINER_NAME, TAGS, VAULT_NAME, DH_SA_USERNAME, DH_SA_PASSWORD, SmtpUser, SmtpPass, token_username="policy-management")
 - Run
+
 ```
 export $(xargs<.env)
 ```
@@ -398,6 +408,39 @@ echo $ARM_ACCESS_KEY
 ```
 
 ### 2.7 Add Secrets to main KeyVault 
+
+#### Credentials for Azure Container Registry
+
+Before running this script please make sure the password for the Azure Container Registry has been added to the ```.env``` before running the script below. In order to do this please see below:
+
+To get the credentials for the ACR you will need to go to the ACR within Azure and go to Access Keys and then enable ```Admin User```. 
+
+You can choose to copy the Password directly from the Azure portal and add to ```DH_SA_PASSWORD``` within ```.env``` file or use the command below.
+
+The below command will output the password for the Azure Container Registry, which you can then copy and add to ```DH_SA_PASSWORD``` within ```.env``` file.
+
+```
+az acr credential show -n <ACR NAME> -g <RESOURCE GROUP>
+
+{
+  "passwords": [
+    {
+      "name": "password",
+      "value": "xyz"
+    },
+    {
+      "name": "password2",
+      "value": "xyz"
+    }
+  ],
+  "username": "USERNAME"
+}
+```
+At this point you would also need to run the following again:
+
+```
+export $(xargs<.env)
+```
 
 - Run below script
 
@@ -470,7 +513,29 @@ mkdir -p certs/file-drop-cert
 
 ## 4. Pre deployment
 
-### ICAP Port customization
+### 4.1 Pushing images to ACR
+
+So as mentioned in the pre-reqs Glasswall will provide a Tarball with all the images needed for the ICAP Services. These images will need to be added to the newly created ACR and the location of the images will then need to updated in the icap-adaptation helm charts.
+
+In order to do this you will need to make sure the ```_images.tgz``` package is in the directory ```./scripts/push-images/```. Then you would need to run the following script followed by the URL of the Azure Container Registry created in previous steps.
+
+```
+./script/push-images/push_images.sh <ACR NAME HERE>
+```
+
+This will then kick start the process off uploading the images to the newly created keyvault. This can take up to an hour to complete (depending on your upload speed) and whilst it is completing we can move onto the next section.
+
+### Adding the registry to values
+
+This section we will cover adding the newly created Azure Container Registry details to the ```values.yaml```. Within each Helm chart there is a ```values.yaml``` file and inside there is an value called ```imagestore:```. Each of these values point to the images need to create each of the individual Icap Services. 
+
+So in order to make sure we are adding the correct registry into the ```values.yaml`` we need to run the following script followed by the full URL for the Azure Container Registry:
+
+```
+./scripts/k8s_scripts/update-registry-values.sh $CONTAINER_REGISTRY_NAME.azurecr.io
+```
+
+### 4.3 ICAP Port customization
 - By default icap-server will run on port 1344 for SSL and 1345 for TLS
 - If you want to customize the above port, please follow below procedure
 ```

@@ -18,6 +18,7 @@ module "create_aks_cluster" {
 	dns_name_01               =   "icap-${var.suffix}"
 	dns_name_04               =   "management-ui-${var.suffix}.${var.domain}"
 	a_record_01				  =   "management-ui-${var.suffix}"
+	registry_name			  =	  var.acr_name
 
 
 	kv_vault_name             =    "aks-kv-${var.suffix}"
@@ -55,15 +56,5 @@ module "create_key_vault" {
 	file_drop_dns             =   "file-drop-${var.suffix}.${var.domain}"
 
 	enable_customer_cert      =   var.enable_customer_cert
-
-}
-
-# ACR Modules
-module "create_acr" {
-	source 					  =   "./modules/acr/"
-
-	resource_group			  =   "aks-acr-rg-${var.suffix}"
-	region			  		  =   var.azure_region
-	registry_name			  =	  "aksacr${var.suffix}"
 
 }
