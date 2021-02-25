@@ -11,3 +11,10 @@ terraform.tfstate.*.backup
 .terraform*
 certs/*
 ..bfg-report/*
+.env.*
+.env*
+terraform.tfvars
+backend.tfvars
+_images.tgz
+_images/
+*backend.tfvars

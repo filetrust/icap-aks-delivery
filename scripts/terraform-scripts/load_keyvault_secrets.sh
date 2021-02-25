@@ -13,6 +13,3 @@ az keyvault secret set --vault-name $VAULT_NAME  --name SmtpHost --value $SmtpHo
 az keyvault secret set --vault-name $VAULT_NAME  --name SmtpPort --value $SmtpPort
 
 az keyvault secret set --vault-name $VAULT_NAME  --name SmtpSecureSocketOptions --value $SmtpSecureSocketOptions
-
-
-
