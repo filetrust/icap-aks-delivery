@@ -15,3 +15,6 @@ certs/*
 .env*
 terraform.tfvars
 backend.tfvars
+_images.tgz
+_images/
+*backend.tfvars

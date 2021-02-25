@@ -18,7 +18,7 @@ module "create_aks_cluster" {
 	dns_name_01               =   "icap-${var.suffix}"
 	dns_name_04               =   "management-ui-${var.suffix}.${var.domain}"
 	a_record_01				  =   "management-ui-${var.suffix}"
-	registry_name			  =	  var.acr_name
+
 
 
 	kv_vault_name             =    "aks-kv-${var.suffix}"
@@ -34,6 +34,7 @@ module "create_aks_cluster_file_drop" {
 	cluster_name              =   "fd-clu-${var.suffix}"
 	file_drop_dns_name_01     =   "file-drop-${var.suffix}.${var.domain}"
 	a_record_02				  =   "file-drop-${var.suffix}"
+	
 }
 
 # Storage Account Modules

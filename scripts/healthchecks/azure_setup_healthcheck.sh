@@ -105,7 +105,7 @@ if [ "$container_registry" = "$CONTAINER_REGISTRY_NAME" ]; then
       echo "$container_registry belongs to differnet resource group $RESOURCE_GROUP_NAME";
       echo "We suggest you to give unique keyvault name and try below command";
       echo "export $CONTAINER_REGISTRY_NAME='' "
-      echo "az keyvault create --name $CONTAINER_REGISTRY_NAME --resource-group $RESOURCE_GROUP_NAME --location $REGION"
+      echo "az keyvault create --name $CONTAINER_REGISTRY_NAME --resource-group $RESOURCE_GROUP_NAME --location $REGION --sku Standard"
       echo ${white}
   fi
 

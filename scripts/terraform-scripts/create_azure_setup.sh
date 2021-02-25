@@ -21,7 +21,7 @@ az keyvault create --name $VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --lo
 az keyvault secret set --vault-name $VAULT_NAME --name terraform-backend-key --value $ACCOUNT_KEY
 
 # Create ACR
-az acr create --resource-group $RESOURCE_GROUP_NAME --name $CONTAINER_REGISTRY_NAME
+az acr create --resource-group $RESOURCE_GROUP_NAME --name $CONTAINER_REGISTRY_NAME --sku Premium
 
 echo "resource group": $RESOURCE_GROUP_NAME
 echo "storage_account_name: $STORAGE_ACCOUNT_NAME"
@@ -40,7 +40,7 @@ EOF
 
 cat <<EOF >terraform.tfvars
 azure_region           = "UKWEST"
-suffix                 = "stg"
+suffix                 = "mp1"
 
 domain                 = "ukwest.cloudapp.azure.com"
 
@@ -48,5 +48,5 @@ icap_port              = 1344
 icap_tlsport           = 1345
 
 enable_customer_cert   = false
-container_registry_url = "$CONTAINER_REGISTRY_NAME
+acr_name               = $CONTAINER_REGISTRY_NAME
 EOF

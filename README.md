@@ -32,7 +32,7 @@
       - [Customer Certificates](#customer-certificates)
   - [4. Pre deployment](#4-pre-deployment)
     - [4.1 Pushing images to ACR](#41-pushing-images-to-acr)
-    - [Adding the registry to values](#adding-the-registry-to-values)
+    - [4.2 Adding the registry to values](#42-adding-the-registry-to-values)
     - [4.3 ICAP Port customization](#43-icap-port-customization)
   - [5. Deployment](#5-deployment)
     - [5.1 Setup and Initialise Terraform](#51-setup-and-initialise-terraform)
@@ -411,38 +411,15 @@ echo $ARM_ACCESS_KEY
 
 #### Credentials for Azure Container Registry
 
-Before running this script please make sure the password for the Azure Container Registry has been added to the ```.env``` before running the script below. In order to do this please see below:
+Before running this script please make sure you add your service principle ```clientID``` and ```clientSecret``` has been added to the ```.env``` before running the script below. You need to add it to the ```DH_SA_USERNAME``` and ```DH_SA_PASSWORD``` fields:
 
-To get the credentials for the ACR you will need to go to the ACR within Azure and go to Access Keys and then enable ```Admin User```. 
-
-You can choose to copy the Password directly from the Azure portal and add to ```DH_SA_PASSWORD``` within ```.env``` file or use the command below.
-
-The below command will output the password for the Azure Container Registry, which you can then copy and add to ```DH_SA_PASSWORD``` within ```.env``` file.
-
-```
-az acr credential show -n <ACR NAME> -g <RESOURCE GROUP>
-
-{
-  "passwords": [
-    {
-      "name": "password",
-      "value": "xyz"
-    },
-    {
-      "name": "password2",
-      "value": "xyz"
-    }
-  ],
-  "username": "USERNAME"
-}
-```
-At this point you would also need to run the following again:
+- Once you've added the service principle credentials to the ```.env``` you will need to run the below again:
 
 ```
 export $(xargs<.env)
 ```
 
-- Run below script
+- Then run below script
 
 ```
 ./scripts/terraform-scripts/load_keyvault_secrets.sh
@@ -520,20 +497,34 @@ So as mentioned in the pre-reqs Glasswall will provide a Tarball with all the im
 In order to do this you will need to make sure the ```_images.tgz``` package is in the directory ```./scripts/push-images/```. Then you would need to run the following script followed by the URL of the Azure Container Registry created in previous steps.
 
 ```
-./script/push-images/push_images.sh <ACR NAME HERE>
+cd /script/push-images/
+
+./push_images.sh <ACR NAME HERE>
 ```
 
 This will then kick start the process off uploading the images to the newly created keyvault. This can take up to an hour to complete (depending on your upload speed) and whilst it is completing we can move onto the next section.
 
-### Adding the registry to values
+### 4.2 Adding the registry to values
 
 This section we will cover adding the newly created Azure Container Registry details to the ```values.yaml```. Within each Helm chart there is a ```values.yaml``` file and inside there is an value called ```imagestore:```. Each of these values point to the images need to create each of the individual Icap Services. 
 
 So in order to make sure we are adding the correct registry into the ```values.yaml`` we need to run the following script followed by the full URL for the Azure Container Registry:
 
+Firstly
 ```
-./scripts/k8s_scripts/update-registry-values.sh $CONTAINER_REGISTRY_NAME.azurecr.io
+cp ./scripts/k8_scripts/update-registry-values.sh ./charts/icap-infrastructure
 ```
+Then
+```
+cd ./charts/icap-infrastructure
+```
+Now run the script
+```
+./update-registry-values.sh $CONTAINER_REGISTRY_NAME.azurecr.io/
+```
+***It's important you do not forget the ```/``` off the end of the registry name, as this will cause issues pulling the image from the ACR***
+
+All of the registry values with in ```values.yaml``` will have been updated to the ACR we created earlier in the steps.
 
 ### 4.3 ICAP Port customization
 - By default icap-server will run on port 1344 for SSL and 1345 for TLS

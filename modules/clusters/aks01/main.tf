@@ -66,6 +66,7 @@ resource "helm_release" "rabbitmq-operator" {
 
   depends_on = [ 
     azurerm_kubernetes_cluster.icap-deploy,
+    null_resource.attach_acr,
    ]
 }
 
@@ -78,6 +79,7 @@ resource "helm_release" "cert-manager" {
 
   depends_on = [ 
     azurerm_kubernetes_cluster.icap-deploy,
+    null_resource.attach_acr,
    ]
 }
 
@@ -97,6 +99,7 @@ resource "helm_release" "ingress-nginx" {
 
   depends_on = [ 
     azurerm_kubernetes_cluster.icap-deploy,
+    null_resource.attach_acr,
    ]
 }
 
@@ -183,7 +186,20 @@ resource "helm_release" "ncfs" {
 
   depends_on = [ 
     azurerm_kubernetes_cluster.icap-deploy,
+    null_resource.attach_acr,
    ]
+}
+
+resource "null_resource" "attach_acr" {
+
+ provisioner "local-exec" {
+
+    command = "az aks update -n ${var.cluster_name} -g ${var.resource_group} --attach-acr $CONTAINER_REGISTRY_NAME"
+  }
+  
+  depends_on = [
+    azurerm_kubernetes_cluster.icap-deploy,
+  ]
 }
 
 resource "null_resource" "get_kube_context" {
