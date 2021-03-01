@@ -293,6 +293,8 @@ git --version
 
 - There should be atleast one subscription associated to azure account
 - The subscription should have **Contributor** role which allows user to create and manage virtual machines
+- A service principle with Contributer rights within the subscription of choice
+  - You will need the ```ClientID``` and ```ClientSecret```
 - This documentation will provision a managed Azure Kubernetes (AKS) cluster on which to deploy the application. 
 - This cluster has configured to auto scaling and  runs on a minimum of 4 nodes and maximum of 100 nodes.
 - The specification of the nodes is defined in the `modules/aks01` configuration of this deployment
