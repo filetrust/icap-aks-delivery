@@ -93,3 +93,8 @@ variable "chart_repo03" {
   type        = string
   default 	  = "charts/icap-infrastructure/ingress-nginx"
 }
+
+variable "file_drop_ui_port" {
+    description = "The file_drop_ui_port"
+    type = number
+}

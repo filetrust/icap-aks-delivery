@@ -110,6 +110,11 @@ variable "chart_repo03" {
   default 	  = "./charts/icap-infrastructure/ingress-nginx"
 }
 
+variable "management_ui_port" {
+    description = "The management_ui_port"
+    type = number
+}
+
 ## Administration Chart
 variable "release_name04" {
   description = "This is the name of the release"

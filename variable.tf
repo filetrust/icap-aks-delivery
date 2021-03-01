@@ -28,3 +28,13 @@ variable "enable_customer_cert" {
     type = bool
     default = false
 }
+
+variable "management_ui_port" {
+    description = "The management_ui_port"
+    type = number
+}
+
+variable "file_drop_ui_port" {
+    description = "The file_drop_ui_port"
+    type = number
+}
