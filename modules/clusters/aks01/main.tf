@@ -97,6 +97,11 @@ resource "helm_release" "ingress-nginx" {
         value = var.a_record_01
     }
 
+  set {
+      name  = "controller.service.ports.https"
+      value = var.management_ui_port
+    }
+
   depends_on = [ 
     azurerm_kubernetes_cluster.icap-deploy,
     null_resource.attach_acr,

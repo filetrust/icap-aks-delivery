@@ -99,6 +99,11 @@ resource "helm_release" "ingress-nginx" {
         value = var.a_record_02
     }
 
+  set {
+      name  = "controller.service.ports.https"
+      value = var.file_drop_ui_port
+    }
+
   depends_on = [ 
     azurerm_kubernetes_cluster.file-drop,
     null_resource.attach_acr,
