@@ -52,6 +52,7 @@
 - Git
 - Microsoft account
 - Azure Subscription
+  - Owner or Azure account administrator role on the Azure subscription
 - Dockerhub account 
 - Tarball containing all images for ICAP service
 
